@@ -1,7 +1,10 @@
+from dotenv import load_dotenv
 from typing import Tuple, List
 import sys
 from gunther import AuditProcess
 from gunther.http import GuntherServer
+
+load_dotenv()
 
 def shift_argv(argv: List[str], on_empty_error_message: str) -> Tuple[str, list[str]]:
     if len(argv) == 0:

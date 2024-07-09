@@ -51,9 +51,9 @@ class SlitherAuditor(Auditor):
                 audit_finding = AuditFinding(
                         title=_check_to_audit_finding_title[check],
                         auditor="slither",
-                        description=detector["description"],
                         severity=severity,
                         recommendation="",
+                        raw=detector["description"],
                         )
                 self.findings.append(audit_finding)
                 self._checks.append(check)

@@ -22,21 +22,24 @@ class AuditFinding(object):
     def __init__(self,
                  title: str,
                  auditor: str,
-                 description: str,
                  severity: FindingSeverity,
-                 recommendation: str,
+                 raw: str = "",
+                 description: str = "",
+                 recommendation: str = "",
                  ):
         self.title = title
         self.auditor = auditor
         self.description = description
         self.severity = severity
         self.recommendation = recommendation
+        self.raw = raw
 
     def to_dict(self) -> dict:
         return {
             "title": self.title,
             "auditor": self.auditor,
             "description": self.description,
+            "raw": self.raw,
             "severity": str(self.severity),
             "recommendation": self.recommendation,
         }
@@ -46,6 +49,11 @@ class Auditor(ABC):
 
     @abstractmethod
     def perform_audit(self, input: str):
+        pass
+
+class Writer(ABC):
+    @abstractmethod
+    def describe(self, finding: AuditFinding) -> str:
         pass
 
 class AuditReport(object):
