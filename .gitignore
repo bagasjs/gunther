@@ -3,5 +3,5 @@ venv
 __pycache__
 crytic-export
 report.html
+reports
 .env
-test
