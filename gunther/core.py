@@ -1,7 +1,7 @@
+from __future__ import annotations
 from typing import List, Dict
 from abc import ABC, abstractmethod
 from enum import Enum
-import json
 
 class AuditError(Exception):
     def __init__(self, message: str):
@@ -53,47 +53,52 @@ class Auditor(ABC):
 
 class Writer(ABC):
     @abstractmethod
-    def describe(self, finding: AuditFinding) -> str:
+    def extract_title(self, result: AuditResult) -> str:
         pass
 
-class AuditReport(object):
-    def __init__(self, 
-                 title: str,
-                 description: str,
-                 findings: List[AuditFinding]):
-        self.title = title
-        self.description = description
+    @abstractmethod
+    def describe_audit_finding(self, finding: AuditFinding) -> str:
+        pass
+
+    @abstractmethod
+    def make_audit_result_conclusion(self, result: AuditResult) -> str:
+        pass
+
+class AuditResult(object):
+    _findings_amount: int
+    _findings_categories_count: Dict[FindingSeverity, int]
+    _findings_changed: bool
+
+    findings: List[AuditFinding]
+
+    def __init__(self, findings: List[AuditFinding]):
         self.findings = findings
 
-    def to_html(self) -> str:
-        result = ''
-        result += f'<center><h1>{self.title}</h1></center>'
-        result +=  '<ol type="A">'
-        result += f'    <li>\n<h2>Description</h2>\n<p>{self.description}</p>\n</li>\n'
-        result +=  '    <li>\n<h2>Audit Findings</h2>\n'
-        result +=  '        <ol type="1">\n'
+        self._findings_amount = len(self.findings)
+        self._findings_categories_count = {}
+        self._findings_categories_count[FindingSeverity.Note] = 0
+        self._findings_categories_count[FindingSeverity.Low] = 0
+        self._findings_categories_count[FindingSeverity.Medium] = 0
+        self._findings_categories_count[FindingSeverity.High] = 0
+        self._findings_changed = True
 
-        for finding in self.findings:
-            result +=  '            <li>\n'
-            result += f'            <h3>{finding.title}</h3>\n'
-            result +=  '            <ol type="a">\n'
-            result += f'                <li><h4>Severity: {finding.severity.value}</h4></li>\n'
-            result += f'                <li><h4>Description</h4><p>{finding.description}</p></li>\n'
-            result +=  '            </ol>\n'
-            result +=  '            </li>\n'
+    def add_finding(self, finding: AuditFinding):
+        self._findings_amount += 1
+        self._findings_changed = True
+        self.findings.append(finding)
 
+    def get_findings_amount(self) -> int:
+        return self._findings_amount
 
-        result += "\n</ol>\n</li>\n"
-        result += "</ol>\n"
-        return result
+    def get_finding_categories_count(self) -> Dict[FindingSeverity, int]:
+        if self._findings_changed:
+            for finding in self.findings:
+                self._findings_categories_count[finding.severity] += 1
+        return self._findings_categories_count
 
     def to_dict(self) -> dict:
         findings = []
         for finding in self.findings:
             findings.append(finding.to_dict())
-        data = {
-            "title": self.title,
-            "description": self.description,
-            "findings": findings,
-        }
-        return data        
+        data = { "findings": findings, }
+        return data

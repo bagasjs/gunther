@@ -4,3 +4,4 @@ __pycache__
 crytic-export
 report.html
 .env
+test

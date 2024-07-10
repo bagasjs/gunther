@@ -4,18 +4,10 @@ import subprocess
 import json
 
 _impact_to_severity = {
+    "High": FindingSeverity.High,
+    "Medium": FindingSeverity.Medium,
+    "Low": FindingSeverity.Low,
     "Informational": FindingSeverity.Note,
-}
-
-_check_to_audit_finding_title = {
-    "divide-before-multiply": "Divide before multiply",
-    "assembly": "Usage of assembly",
-    "unused-return": "Ignoring return value of a function",
-    "solc-version": "Not secure solidity compiler version usage",
-    "low-level-calls": "Low level calls",
-    "naming-convention": "Not compliance naming standard",
-    "too-many-digits": "Not compliance naming standard",
-    "unused-import": "Importing unused modules",
 }
 
 
@@ -49,7 +41,7 @@ class SlitherAuditor(Auditor):
                     severity = FindingSeverity.Unknown
 
                 audit_finding = AuditFinding(
-                        title=_check_to_audit_finding_title[check],
+                        title=check,
                         auditor="slither",
                         severity=severity,
                         recommendation="",

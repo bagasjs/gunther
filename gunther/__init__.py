@@ -1,3 +1,3 @@
-from gunther.core import AuditError, AuditFinding, AuditReport, Auditor
-from gunther.audit_process import AuditProcess
+from gunther.core import AuditError, AuditFinding, AuditResult, Auditor
+from gunther.audit import AuditProcess, AuditReportGenerator
 

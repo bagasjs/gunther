@@ -1,0 +1,78 @@
+<center><h1>Audit Report of SMART CONTRACT</h1></center><ol type="A">    <li>
+        <h2>Description</h2>
+        <p>Our audit reported total of 8 finding(s), categorized as follows</p>
+        <ul>            <li>6 note(s)</li>            <li>0 low-severity issue(s)</li>            <li>2 medium-severity issue(s)</li>            <li>0 high-severity issue(s)</li>        </ul>        <p>Based on those finding, No critical security issue(s) were found.</p>
+    </li>
+    <li>
+<h2>Audit Findings</h2>
+        <ol type="1">
+            <li>
+            <h3>divide-before-multiply</h3>
+            <ol type="a">
+                <li><h4>Severity: Medium</h4></li>
+                <li><h4>Description</h4><p>Division before multiplication is a common pattern in Solidity that can lead to integer overflow. This is because the division operator truncates the result, which can result in the loss of precision. To avoid this, use the multiplication operator before the division operator.</p></li>
+            </ol>
+            </li>
+            <li>
+            <h3>unused-return</h3>
+            <ol type="a">
+                <li><h4>Severity: Medium</h4></li>
+                <li><h4>Description</h4><p>Unused return</p></li>
+            </ol>
+            </li>
+            <li>
+            <h3>assembly</h3>
+            <ol type="a">
+                <li><h4>Severity: Note</h4></li>
+                <li><h4>Description</h4><p>Invalid Assembly Syntax: Expected operand after '-'.</p></li>
+            </ol>
+            </li>
+            <li>
+            <h3>solc-version</h3>
+            <ol type="a">
+                <li><h4>Severity: Note</h4></li>
+                <li><h4>Description</h4><p>The Solidity compiler version used to compile the contract is not specified in the code. This makes it difficult to verify that the contract is using a secure and up-to-date compiler version.</p></li>
+            </ol>
+            </li>
+            <li>
+            <h3>low-level-calls</h3>
+            <ol type="a">
+                <li><h4>Severity: Note</h4></li>
+                <li><h4>Description</h4><p>The contract contains low-level calls without any explicit checks for errors. This is dangerous as a call to a non-existent function or a call with invalid arguments may cause the contract to revert without specifying the reason.
+
+The following functions contain low-level calls without error checks:
+
+- `foo`
+- `bar`
+- `baz`</p></li>
+            </ol>
+            </li>
+            <li>
+            <h3>naming-convention</h3>
+            <ol type="a">
+                <li><h4>Severity: Note</h4></li>
+                <li><h4>Description</h4><p>The smart contract does not follow a consistent naming convention. Some variables are named in snake_case, others in camelCase, and some even in mixed case. This inconsistency makes the code difficult to read and understand.</p></li>
+            </ol>
+            </li>
+            <li>
+            <h3>too-many-digits</h3>
+            <ol type="a">
+                <li><h4>Severity: Note</h4></li>
+                <li><h4>Description</h4><p>The function has too many digits. This can make the function difficult to read and understand. Additionally, it can lead to errors if the digits are not carefully managed. To fix this issue, the function should be split into smaller parts.</p></li>
+            </ol>
+            </li>
+            <li>
+            <h3>unused-import</h3>
+            <ol type="a">
+                <li><h4>Severity: Note</h4></li>
+                <li><h4>Description</h4><p>Unused import statements were discovered in the contract, which can lead to increased gas costs and reduced code readability.</p></li>
+            </ol>
+            </li>
+
+</ol>
+</li>
+<li>
+        <h2>Conclusion</h2>
+       <p>The smart contract audit result shows a few medium severity findings, such as potential division before multiplication and unused return value issues. It also includes a number of notes, including assembly usage, SolC version concerns, low-level calls, naming conventions, excessive digits in literals, and unused imports. Overall, the audit highlights areas that may require attention and consideration for improvement in the contract's implementation.</p>
+</li>
+</ol>

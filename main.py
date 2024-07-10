@@ -2,6 +2,8 @@ from dotenv import load_dotenv
 from typing import Tuple, List
 import sys
 from gunther import AuditProcess
+from gunther.audit import AuditReportGenerator
+from gunther.writers import GeminiWriter
 from gunther.http import GuntherServer
 
 load_dotenv()
@@ -28,9 +30,11 @@ if __name__ == "__main__":
         case "audit":
             input, argv = shift_argv(argv, "Please provide the address or file path of the smart contract")
             audit_process = AuditProcess(input)
-            audit_report = audit_process.generate_report("Audit", "Bagas Jonathan Sitanggang")
+            result = audit_process.perform()
+            writer = GeminiWriter()
+            report_generator = AuditReportGenerator(result, writer)
             with open("report.html", "w") as file:
-                file.write(audit_report.to_html())
+                file.write(report_generator.generate_html())
         case "serve":
             server = GuntherServer()
             server.start(8080)

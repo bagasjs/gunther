@@ -1,0 +1,55 @@
+<center><h1>Audit Report of SMART CONTRACT</h1></center><ol type="A">    <li>
+        <h2>Description</h2>
+        <p>Our audit reported total of 4 finding(s), categorized as follows</p>
+        <ul>            <li>2 note(s)</li>            <li>2 low-severity issue(s)</li>            <li>0 medium-severity issue(s)</li>            <li>0 high-severity issue(s)</li>        </ul>        <p>Based on those finding, No critical security issue(s) were found.</p>
+    </li>
+    <li>
+<h2>Audit Findings</h2>
+        <ol type="1">
+            <li>
+            <h3>shadowing-local</h3>
+            <ol type="a">
+                <li><h4>Severity: Low</h4></li>
+                <li><h4>Description</h4><p>Shadowing local variables is considered anti-pattern, as it can lead to unexpected behavior and bugs. Instead, always use the original variable.</p></li>
+            </ol>
+            </li>
+            <li>
+            <h3>missing-zero-check</h3>
+            <ol type="a">
+                <li><h4>Severity: Low</h4></li>
+                <li><h4>Description</h4><p>Missing Zero-Check Vulnerability
+
+This finding indicates that the smart contract does not properly check for zero values or null values in critical inputs, which could lead to unexpected or erroneous behavior. Failing to handle zero values appropriately can result in vulnerabilities such as division by zero errors, incorrect computations, or denial-of-service attacks.
+
+It is important to ensure that smart contracts handle zero values gracefully and reject invalid inputs to prevent unexpected behavior and maintain the integrity of the contract. Thoroughly validate all inputs and handle zero values appropriately to mitigate this vulnerability.</p></li>
+            </ol>
+            </li>
+            <li>
+            <h3>dead-code</h3>
+            <ol type="a">
+                <li><h4>Severity: Note</h4></li>
+                <li><h4>Description</h4><p>This finding indicates that there is a variable or code that is present in the contract but is never used. This can be due to refactoring or copy-pasting code from other contracts without removing unused code. Unused code can increase the size of the contract, making it more expensive to deploy and execute. Additionally, it can make the contract more difficult to read and understand, and may increase the risk of introducing bugs.</p></li>
+            </ol>
+            </li>
+            <li>
+            <h3>solc-version</h3>
+            <ol type="a">
+                <li><h4>Severity: Note</h4></li>
+                <li><h4>Description</h4><p>The Solidity compiler version is not included in the provided context.</p></li>
+            </ol>
+            </li>
+
+</ol>
+</li>
+<li>
+        <h2>Conclusion</h2>
+       <p>The smart contract contains several findings:
+
+1. **Low severity:** The constructor shadows a local variable.
+2. **Low severity:** The constructor lacks a zero-check on a function call.
+3. **Note severity:** The contract contains dead code that could be removed.
+4. **Note severity:** The contract uses an outdated version of Solidity.
+
+The contract code should be reviewed to address these findings and improve its security and maintainability.</p>
+</li>
+</ol>
