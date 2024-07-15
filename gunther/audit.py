@@ -1,6 +1,5 @@
 from gunther.core import AuditResult, AuditError, FindingSeverity, Writer
 from gunther.auditors import list_of_auditors
-from gunther.writers import GeminiWriter
 
 class AuditProcess(object):
     def __init__(self, input: str):
