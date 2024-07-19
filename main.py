@@ -4,18 +4,18 @@ import sys
 from gunther import AuditProcess
 from gunther.audit import AuditReportGenerator
 from gunther.writers import GeminiWriter
-from gunther.http import GuntherServer
+from gunther.web import start_server
 
 load_dotenv()
 
-def shift_argv(argv: List[str], on_empty_error_message: str) -> Tuple[str, list[str]]:
-    if len(argv) == 0:
-        print(f"ERROR: {on_empty_error_message}")
-        sys.exit(-1)
-    return argv[0], argv[1:]
-
 if __name__ == "__main__":
     argv = sys.argv
+    def shift_argv(argv: List[str], on_empty_error_message: str) -> Tuple[str, list[str]]:
+        if len(argv) == 0:
+            print(f"ERROR: {on_empty_error_message}")
+            sys.exit(-1)
+        return argv[0], argv[1:]
+
     program, argv = shift_argv(argv, "Unreachable state")
     subcommand, argv = shift_argv(argv, 
       "Please provide the subcommand. Check at subcommand `help` for list of available subcommands")
@@ -36,8 +36,7 @@ if __name__ == "__main__":
             with open("report.html", "w") as file:
                 file.write(report_generator.generate_html())
         case "serve":
-            server = GuntherServer()
-            server.start(8080)
+            start_server()
         case _:
             print(f"ERROR: Please provide a valid subcommand")
             sys.exit(-1)
