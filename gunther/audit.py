@@ -6,7 +6,8 @@ class AuditProcess(object):
         self.input = input
 
     def perform(self) -> AuditResult:
-        result =  AuditResult( findings=[],)
+        # TODO: find a way to support source files not only etherscan address
+        result =  AuditResult(context=self.input, context_is_address=True, findings=[],)
         for name, analyzer in list_of_analyzers.items():
             print(f"INFO: Running `{name}` analyzer")
             try:
@@ -18,16 +19,16 @@ class AuditProcess(object):
         return result
 
 class AuditReportGenerator(object):
-    def __init__(self, result: AuditResult, writer: Writer):
+    def __init__(self, title: str, result: AuditResult, writer: Writer):
+        self.title = title
         self.result = result
         self.writer = writer
 
     def generate_html(self) -> str:
-        title = self.writer.extract_title(self.result)
         conclusion = self.writer.make_audit_result_conclusion(self.result)
 
         result = ''
-        result += f'<center><h1>{title}</h1></center>'
+        result += f'<center><h1>{self.title}</h1></center>'
         result +=  '<ol type="A">'
         result +=  '    <li>\n'
         result +=  '        <h2>Description</h2>\n'
@@ -50,12 +51,13 @@ class AuditReportGenerator(object):
         result +=  '        <ol type="1">\n'
 
         for finding in self.result.findings:
+            descibed_finding = self.writer.describe_finding(finding)
             result +=  '            <li>\n'
-            result += f'            <h3>{finding.title}</h3>\n'
+            result += f'            <h3>{descibed_finding.title}</h3>\n'
             result +=  '            <ol type="a">\n'
-            result += f'                <li><h4>Severity: {finding.severity.value}</h4></li>\n'
-            description = self.writer.describe_audit_finding(finding)
-            result += f'                <li><h4>Description</h4><p>{description}</p></li>\n'
+            result += f'                <li><h4>Severity: {descibed_finding.severity.value}</h4></li>\n'
+            result += f'                <li><h4>Description</h4><p>{descibed_finding.description}</p></li>\n'
+            result += f'                <li><h4>Recommendation</h4><p>{descibed_finding.recommendation}</p></li>\n'
             result +=  '            </ol>\n'
             result +=  '            </li>\n'
 

@@ -2,6 +2,7 @@ from typing import List
 from gunther.core import Analyzer, AuditError, AuditFinding, FindingSeverity
 import subprocess
 import json
+import os
 
 _impact_to_severity = {
     "High": FindingSeverity.High,
@@ -20,7 +21,7 @@ class SlitherAnalyzer(Analyzer):
 
     def analyze(self, input: str):
         self.reset()
-        command = ["slither", input, "--json", "-"]
+        command = ["slither", input, "--etherscan-apikey", os.getenv("ETHERSCAN_API_KEY"), "--json", "-"]
         result = subprocess.run(command, shell=False, stdout=subprocess.PIPE)
         raw_findings_as_str = result.stdout.decode("utf-8")
         if len(raw_findings_as_str) == 0:
@@ -42,7 +43,6 @@ class SlitherAnalyzer(Analyzer):
 
                 audit_finding = AuditFinding(
                         title=check,
-                        auditor="slither",
                         severity=severity,
                         recommendation="",
                         raw=detector["description"],

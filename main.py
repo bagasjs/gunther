@@ -1,8 +1,9 @@
 from dotenv import load_dotenv
 from typing import Tuple, List
 import sys
-from gunther import AuditProcess
+from gunther import AuditProcess, AuditError
 from gunther.audit import AuditReportGenerator
+from gunther.utils import get_contract_name_from_etherscan
 from gunther.writers import GeminiWriter
 from gunther.web import start_server
 
@@ -31,9 +32,15 @@ if __name__ == "__main__":
             input, argv = shift_argv(argv, "Please provide the address or file path of the smart contract")
             audit_process = AuditProcess(input)
             result = audit_process.perform()
+            result.set_timestamp_as_now()
             writer = GeminiWriter()
             print("INFO: Generating audit report")
-            report_generator = AuditReportGenerator(result, writer)
+            contract_name = "A Smart Contract"
+            try:
+                contract_name = get_contract_name_from_etherscan(input)
+            except AuditError as err:
+                print("ERROR: Something went wrong")
+            report_generator = AuditReportGenerator(contract_name, result, writer)
             with open("report.html", "w") as file:
                 file.write(report_generator.generate_html())
         case "serve":

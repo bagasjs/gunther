@@ -23,14 +23,12 @@ class FindingSeverity(Enum):
 class AuditFinding(object):
     def __init__(self,
                  title: str,
-                 auditor: str,
                  severity: FindingSeverity,
                  raw: str = "",
                  description: str = "",
                  recommendation: str = "",
                  ):
         self.title = title
-        self.auditor = auditor
         self.description = description
         self.severity = severity
         self.recommendation = recommendation
@@ -39,10 +37,9 @@ class AuditFinding(object):
     def to_dict(self) -> dict:
         return {
             "title": self.title,
-            "auditor": self.auditor,
-            "description": self.description,
-            "raw": self.raw,
             "severity": str(self.severity),
+            "raw": self.raw,
+            "description": self.description,
             "recommendation": self.recommendation,
         }
 
@@ -53,13 +50,26 @@ class Analyzer(ABC):
     def analyze(self, input: str):
         pass
 
+# Find if this useful
+class DescribedAuditFinding(object):
+    def __init__(self, title: str, raw: str, severity: FindingSeverity, description: str, recommendation: str):
+        self.title = title
+        self.raw = raw
+        self.severity = severity
+        self.description = description
+        self.recommendation = recommendation
+
 class Writer(ABC):
     @abstractmethod
-    def extract_title(self, result: AuditResult) -> str:
+    def describe_audit_finding(self, finding: AuditFinding) -> str:
         pass
 
     @abstractmethod
-    def describe_audit_finding(self, finding: AuditFinding) -> str:
+    def describe_finding(self, finding: AuditFinding) -> DescribedAuditFinding:
+        pass
+
+    @abstractmethod
+    def execute_prompt(self, prompt: str) -> str:
         pass
 
     @abstractmethod
@@ -73,9 +83,13 @@ class AuditResult(object):
 
     findings: List[AuditFinding]
     unix_timestamp: int
+    context: str
+    context_is_address: bool
 
-    def __init__(self, findings: List[AuditFinding]):
+    def __init__(self, context: str, context_is_address: bool, findings: List[AuditFinding]):
         self.findings = findings
+        self.context = context
+        self.context_is_address = context_is_address
 
         self._findings_amount = len(self.findings)
         self._findings_categories_count = {}
@@ -108,16 +122,3 @@ class AuditResult(object):
             findings.append(finding.to_dict())
         data = { "findings": findings, }
         return data
-
-
-class AuditDatabase:
-    conn: sqlite3.Connection
-
-    def __init__(self, file: str):
-        self.conn = sqlite3.connect(file)
-    
-    def load_result(self, result: AuditResult):
-        pass
-
-    def store_result(self, result: AuditResult):
-        pass
