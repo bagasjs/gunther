@@ -30,16 +30,15 @@ if __name__ == "__main__":
             print("    help   Get this help message")
         case "audit":
             input, argv = shift_argv(argv, "Please provide the address or file path of the smart contract")
+            writer = GeminiWriter()
             audit_process = AuditProcess(input)
             result = audit_process.perform()
-            result.set_timestamp_as_now()
-            writer = GeminiWriter()
-            print("INFO: Generating audit report")
             contract_name = "A Smart Contract"
             try:
                 contract_name = get_contract_name_from_etherscan(input)
             except AuditError as err:
                 print("ERROR: Something went wrong")
+            print("INFO: Generating audit report")
             report_generator = AuditReportGenerator(contract_name, result, writer)
             with open("report.html", "w") as file:
                 file.write(report_generator.generate_html())

@@ -2,7 +2,6 @@ from __future__ import annotations
 from typing import List, Dict
 from abc import ABC, abstractmethod
 from enum import Enum
-import sqlite3
 from datetime import datetime, timezone
 
 class AuditError(Exception):

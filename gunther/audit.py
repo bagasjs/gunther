@@ -16,6 +16,7 @@ class AuditProcess(object):
                     result.add_finding(finding)
             except AuditError as e:
                 print(f"ERROR: {e.message}")
+        result.set_timestamp_as_now()
         return result
 
 class AuditReportGenerator(object):
