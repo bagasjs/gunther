@@ -32,6 +32,7 @@ if __name__ == "__main__":
             audit_process = AuditProcess(input)
             result = audit_process.perform()
             writer = GeminiWriter()
+            print("INFO: Generating audit report")
             report_generator = AuditReportGenerator(result, writer)
             with open("report.html", "w") as file:
                 file.write(report_generator.generate_html())

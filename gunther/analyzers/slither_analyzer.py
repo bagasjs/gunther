@@ -1,5 +1,5 @@
 from typing import List
-from gunther.core import Auditor, AuditError, AuditFinding, FindingSeverity
+from gunther.core import Analyzer, AuditError, AuditFinding, FindingSeverity
 import subprocess
 import json
 
@@ -11,14 +11,14 @@ _impact_to_severity = {
 }
 
 
-class SlitherAuditor(Auditor):
+class SlitherAnalyzer(Analyzer):
     _checks: List[str]
 
     def reset(self):
         self.findings = []
         self._checks = []
 
-    def perform_audit(self, input: str):
+    def analyze(self, input: str):
         self.reset()
         command = ["slither", input, "--json", "-"]
         result = subprocess.run(command, shell=False, stdout=subprocess.PIPE)

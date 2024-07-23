@@ -1,5 +1,5 @@
 from gunther.core import AuditResult, AuditError, FindingSeverity, Writer
-from gunther.auditors import list_of_auditors
+from gunther.analyzers import list_of_analyzers
 
 class AuditProcess(object):
     def __init__(self, input: str):
@@ -7,11 +7,11 @@ class AuditProcess(object):
 
     def perform(self) -> AuditResult:
         result =  AuditResult( findings=[],)
-        for auditor_name, auditor in list_of_auditors.items():
-            print(f"INFO: Running `{auditor_name}` auditor")
+        for name, analyzer in list_of_analyzers.items():
+            print(f"INFO: Running `{name}` analyzer")
             try:
-                auditor.perform_audit(self.input)
-                for finding in auditor.findings:
+                analyzer.analyze(self.input)
+                for finding in analyzer.findings:
                     result.add_finding(finding)
             except AuditError as e:
                 print(f"ERROR: {e.message}")

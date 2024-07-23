@@ -2,6 +2,8 @@ from __future__ import annotations
 from typing import List, Dict
 from abc import ABC, abstractmethod
 from enum import Enum
+import sqlite3
+from datetime import datetime, timezone
 
 class AuditError(Exception):
     def __init__(self, message: str):
@@ -44,11 +46,11 @@ class AuditFinding(object):
             "recommendation": self.recommendation,
         }
 
-class Auditor(ABC):
+class Analyzer(ABC):
     findings: List[AuditFinding]
 
     @abstractmethod
-    def perform_audit(self, input: str):
+    def analyze(self, input: str):
         pass
 
 class Writer(ABC):
@@ -70,6 +72,7 @@ class AuditResult(object):
     _findings_changed: bool
 
     findings: List[AuditFinding]
+    unix_timestamp: int
 
     def __init__(self, findings: List[AuditFinding]):
         self.findings = findings
@@ -96,9 +99,25 @@ class AuditResult(object):
                 self._findings_categories_count[finding.severity] += 1
         return self._findings_categories_count
 
+    def set_timestamp_as_now(self):
+        self.unix_timestamp = int(datetime(1970,1,1,1,0,tzinfo=timezone.utc).timestamp())
+
     def to_dict(self) -> dict:
         findings = []
         for finding in self.findings:
             findings.append(finding.to_dict())
         data = { "findings": findings, }
         return data
+
+
+class AuditDatabase:
+    conn: sqlite3.Connection
+
+    def __init__(self, file: str):
+        self.conn = sqlite3.connect(file)
+    
+    def load_result(self, result: AuditResult):
+        pass
+
+    def store_result(self, result: AuditResult):
+        pass
