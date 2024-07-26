@@ -4,6 +4,10 @@ from abc import ABC, abstractmethod
 from enum import Enum
 from datetime import datetime, timezone
 
+from sqlalchemy import create_engine, Engine, Column, Integer, String, Text, ForeignKey, DateTime
+from sqlalchemy.orm import DeclarativeBase, relationship
+from sqlalchemy.sql import func
+
 class AuditError(Exception):
     def __init__(self, message: str):
         super().__init__(message)
@@ -19,19 +23,22 @@ class FindingSeverity(Enum):
     Medium  = "Medium"
     High    = "High"
 
-class AuditFinding(object):
-    def __init__(self,
-                 title: str,
-                 severity: FindingSeverity,
-                 raw: str = "",
-                 description: str = "",
-                 recommendation: str = "",
-                 ):
-        self.title = title
-        self.description = description
-        self.severity = severity
-        self.recommendation = recommendation
-        self.raw = raw
+class Model(DeclarativeBase):
+    pass
+
+class AuditFinding(Model):
+    __tablename__ = "audit_findings"
+    id = Column(Integer, primary_key=True)
+    title = Column(String)
+    severity = Column(String)
+    raw = Column(Text)
+    description = Column(Text, nullable=True)
+    recommendation = Column(Text, nullable=True)
+    created = Column(DateTime(timezone=True), server_default=func.now())
+    updated = Column(DateTime(timezone=True), onupdate=func.now())
+    result_id = Column(Integer, ForeignKey("audit_results.id"))
+
+    result = relationship("AuditResult", back_populates="findings")
 
     def to_dict(self) -> dict:
         return {
@@ -42,13 +49,6 @@ class AuditFinding(object):
             "recommendation": self.recommendation,
         }
 
-class Analyzer(ABC):
-    findings: List[AuditFinding]
-
-    @abstractmethod
-    def analyze(self, input: str):
-        pass
-
 # Find if this useful
 class DescribedAuditFinding(object):
     def __init__(self, title: str, raw: str, severity: FindingSeverity, description: str, recommendation: str):
@@ -58,26 +58,9 @@ class DescribedAuditFinding(object):
         self.description = description
         self.recommendation = recommendation
 
-class Writer(ABC):
-    @abstractmethod
-    def describe_audit_finding(self, finding: AuditFinding) -> str:
-        pass
-
-    @abstractmethod
-    def describe_finding(self, finding: AuditFinding) -> DescribedAuditFinding:
-        pass
-
-    @abstractmethod
-    def execute_prompt(self, prompt: str) -> str:
-        pass
-
-    @abstractmethod
-    def make_audit_result_conclusion(self, result: AuditResult) -> str:
-        pass
-
 class AuditResult(object):
     _findings_amount: int
-    _findings_categories_count: Dict[FindingSeverity, int]
+    _findings_categories_count: Dict[str, int]
     _findings_changed: bool
 
     findings: List[AuditFinding]
@@ -92,10 +75,10 @@ class AuditResult(object):
 
         self._findings_amount = len(self.findings)
         self._findings_categories_count = {}
-        self._findings_categories_count[FindingSeverity.Note] = 0
-        self._findings_categories_count[FindingSeverity.Low] = 0
-        self._findings_categories_count[FindingSeverity.Medium] = 0
-        self._findings_categories_count[FindingSeverity.High] = 0
+        self._findings_categories_count[str(FindingSeverity.Note)] = 0
+        self._findings_categories_count[str(FindingSeverity.Low)] = 0
+        self._findings_categories_count[str(FindingSeverity.Medium)] = 0
+        self._findings_categories_count[str(FindingSeverity.High)] = 0
         self._findings_changed = True
 
     def add_finding(self, finding: AuditFinding):
@@ -106,10 +89,10 @@ class AuditResult(object):
     def get_findings_amount(self) -> int:
         return self._findings_amount
 
-    def get_finding_categories_count(self) -> Dict[FindingSeverity, int]:
+    def get_finding_categories_count(self) -> Dict[str, int]:
         if self._findings_changed:
             for finding in self.findings:
-                self._findings_categories_count[finding.severity] += 1
+                self._findings_categories_count[str(finding.severity)] += 1
         return self._findings_categories_count
 
     def set_timestamp_as_now(self):

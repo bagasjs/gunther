@@ -1,4 +1,5 @@
-from gunther.core import AuditResult, AuditError, FindingSeverity, Writer
+from gunther.core import AuditResult, AuditError, FindingSeverity
+from gunther.writers import Writer
 from gunther.analyzers import list_of_analyzers
 
 class AuditProcess(object):
@@ -27,7 +28,6 @@ class AuditReportGenerator(object):
 
     def generate_html(self) -> str:
         conclusion = self.writer.make_audit_result_conclusion(self.result)
-
         result = ''
         result += f'<center><h1>{self.title}</h1></center>'
         result +=  '<ol type="A">'

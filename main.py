@@ -1,21 +1,24 @@
+import sys
 from dotenv import load_dotenv
 from typing import Tuple, List
-import sys
 from gunther import AuditProcess, AuditError
 from gunther.audit import AuditReportGenerator
+from gunther.audit2 import Auditor
 from gunther.utils import get_contract_name_from_etherscan
 from gunther.writers import GeminiWriter
 from gunther.web import start_server
 
+
 load_dotenv()
+
+def shift_argv(argv: List[str], on_empty_error_message: str) -> Tuple[str, list[str]]:
+    if len(argv) == 0:
+        print(f"ERROR: {on_empty_error_message}")
+        sys.exit(-1)
+    return argv[0], argv[1:]
 
 if __name__ == "__main__":
     argv = sys.argv
-    def shift_argv(argv: List[str], on_empty_error_message: str) -> Tuple[str, list[str]]:
-        if len(argv) == 0:
-            print(f"ERROR: {on_empty_error_message}")
-            sys.exit(-1)
-        return argv[0], argv[1:]
 
     program, argv = shift_argv(argv, "Unreachable state")
     subcommand, argv = shift_argv(argv, 
@@ -30,6 +33,9 @@ if __name__ == "__main__":
             print("    help   Get this help message")
         case "audit":
             input, argv = shift_argv(argv, "Please provide the address or file path of the smart contract")
+            with Auditor() as auditor:
+                result = auditor.analyze_smart_contract_in_network(network="mainnet", address=input)
+
             writer = GeminiWriter()
             audit_process = AuditProcess(input)
             result = audit_process.perform()

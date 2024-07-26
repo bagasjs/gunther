@@ -2,7 +2,8 @@ import google.generativeai as genai
 import os
 import json
 
-from gunther.core import AuditFinding, AuditResult, DescribedAuditFinding, Writer
+from gunther.writers.core import Writer
+from gunther.core import AuditFinding, AuditResult, DescribedAuditFinding
 
 class GeminiWriter(Writer):
     def __init__(self):

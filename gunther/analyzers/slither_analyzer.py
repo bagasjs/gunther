@@ -1,23 +1,31 @@
 from typing import List
-from gunther.core import Analyzer, AuditError, AuditFinding, FindingSeverity
+from gunther.core import AuditError
+from gunther.analyzers.core import AnalysisResultItem, Severity, AnalysisResult, BaseAnalyzer
 import subprocess
 import json
 import os
 
 _impact_to_severity = {
-    "High": FindingSeverity.High,
-    "Medium": FindingSeverity.Medium,
-    "Low": FindingSeverity.Low,
-    "Informational": FindingSeverity.Note,
+    "High": Severity.High,
+    "Medium": Severity.Medium,
+    "Low": Severity.Low,
+    "Informational": Severity.Note,
 }
 
-
-class SlitherAnalyzer(Analyzer):
+class SlitherAnalyzer(BaseAnalyzer):
     _checks: List[str]
+    _result: AnalysisResult
+
+    def __init__(self):
+        self._result = AnalysisResult()
+        self._checks = []
 
     def reset(self):
         self.findings = []
         self._checks = []
+
+    def get_result(self) -> AnalysisResult:
+        return self._result
 
     def analyze(self, input: str):
         self.reset()
@@ -39,13 +47,11 @@ class SlitherAnalyzer(Analyzer):
                 try:
                     severity = _impact_to_severity[detector["impact"]]
                 except KeyError:
-                    severity = FindingSeverity.Unknown
+                    severity = Severity.Unknown
 
-                audit_finding = AuditFinding(
+                self._result.add_item(AnalysisResultItem(
                         title=check,
                         severity=severity,
-                        recommendation="",
-                        raw=detector["description"],
-                        )
-                self.findings.append(audit_finding)
+                        description=detector["description"],
+                    ))
                 self._checks.append(check)
