@@ -11,13 +11,15 @@
     - Reports endpoint
         - [GET] /reports -> This will return the id,address,title of all reports (maybe pagination?)
         - [GET] /reports/{id} -> This will return all the information related to the report including it's findings
-        - [(TENTATIVE)] /reports/{id}/generate-conclusion/{writer:[gemini|chatgpt]}
+        - [GET or POST (TENTATIVE)] /reports/{id}/generate-conclusion/{writer:[gemini|chatgpt]}
     - Findings endpoint
         - [GET] /findings -> This will return the id,title,report_id of all findings
         - [GET] /findings/{id} -> This will return all the information related to findings
-        - [(TENTATIVE)] /findings/{id}/generate-better-title/{writer:[gemini|chatgpt]}
-        - [(TENTATIVE)] /findings/{id}/generate-description/{writer:[gemini|chatgpt]}
-        - [(TENTATIVE)] /findings/{id}/generate-recommendation/{writer:[gemini|chatgpt]}
+        - [GET or POST (TENTATIVE)] /findings/{id}/generate-better-title/{writer:[gemini|chatgpt]}
+        - [GET or POST (TENTATIVE)] /findings/{id}/generate-description/{writer:[gemini|chatgpt]}
+        - [GET or POST (TENTATIVE)] /findings/{id}/generate-recommendation/{writer:[gemini|chatgpt]}
+- Create a better Web UI for client where there's an editor for the report
+- If the REST-api is actually good the CLI should just use the REST-api
 
 ## DONE
 
