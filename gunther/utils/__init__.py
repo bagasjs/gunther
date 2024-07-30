@@ -25,6 +25,9 @@ class Etherscan(object):
     def _make_request_to_etherscan(self):
         pass
 
+    def validate_contract_address(self, address: str, network: str = "mainnet"):
+        pass
+
     def download_contract_source(self, address: str, dirpath: str, override_if_dirpath_exists: bool = False):
         pass
 

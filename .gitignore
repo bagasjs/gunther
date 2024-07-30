@@ -5,3 +5,5 @@ crytic-export
 report.html
 reports
 .env
+KEY
+database.sqlite

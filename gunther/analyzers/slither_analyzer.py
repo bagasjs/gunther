@@ -1,5 +1,6 @@
 from typing import List
-from gunther.core import Analyzer, AuditError, AuditFinding, FindingSeverity
+from gunther.core import AuditError
+from gunther.analyzers.core import Analyzer, FindingSeverity, AnalysisResult
 import subprocess
 import json
 import os
@@ -11,18 +12,23 @@ _impact_to_severity = {
     "Informational": FindingSeverity.Note,
 }
 
-
 class SlitherAnalyzer(Analyzer):
     _checks: List[str]
+    _results: List[AnalysisResult]
 
     def reset(self):
-        self.findings = []
-        self._checks = []
+        self._results = []
+        self._checks  = []
+
+    def get_results(self) -> List[AnalysisResult]:
+        return self._results
 
     def analyze(self, input: str):
         self.reset()
         command = ["slither", input, "--etherscan-apikey", os.getenv("ETHERSCAN_API_KEY"), "--json", "-"]
-        result = subprocess.run(command, shell=False, stdout=subprocess.PIPE)
+        raw_findings_as_str = ""
+        with open("error.log", "w") as f:
+            result = subprocess.run(command, shell=False, stdout=subprocess.PIPE, stderr=f)
         raw_findings_as_str = result.stdout.decode("utf-8")
         if len(raw_findings_as_str) == 0:
             raise AuditError(f"Failed to perform audit for `{input}` with slither")
@@ -41,11 +47,9 @@ class SlitherAnalyzer(Analyzer):
                 except KeyError:
                     severity = FindingSeverity.Unknown
 
-                audit_finding = AuditFinding(
-                        title=check,
-                        severity=severity,
-                        recommendation="",
-                        raw=detector["description"],
-                        )
-                self.findings.append(audit_finding)
+                self._results.append(AnalysisResult(
+                    title=check,
+                    severity=severity,
+                    raw=detector["description"],
+                    ))
                 self._checks.append(check)
