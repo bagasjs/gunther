@@ -27,8 +27,7 @@ class SlitherAnalyzer(Analyzer):
         self.reset()
         command = ["slither", input, "--etherscan-apikey", os.getenv("ETHERSCAN_API_KEY"), "--json", "-"]
         raw_findings_as_str = ""
-        with open("error.log", "w") as f:
-            result = subprocess.run(command, shell=False, stdout=subprocess.PIPE, stderr=f)
+        result = subprocess.run(command, shell=False, stdout=subprocess.PIPE)
         raw_findings_as_str = result.stdout.decode("utf-8")
         if len(raw_findings_as_str) == 0:
             raise AuditError(f"Failed to perform audit for `{input}` with slither")
