@@ -48,12 +48,11 @@ class Auditor(object):
                 analyzer.analyze(address)
                 for item in analyzer.get_results():
                     if echo: print(f"INFO: processing finding {item.title}")
-                    title = None
                     description = None
                     recommendation = None
                     for _ in range(self.AMOUNT_OF_RETRIES):
                         try:
-                            title = self._writer.infer_title_from_raw_finding(item.raw)
+                            print(item.title, "===>", item.raw)
                             if with_description:
                                 description = self._writer.make_description_from_raw_finding(item.raw)
                             if with_recommendation:
@@ -62,8 +61,6 @@ class Auditor(object):
                         except Exception as e:
                             print(f"ERROR: {e}")
 
-                    if title == None:
-                        title = item.title
                     if description == None:
                         description = item.raw
 

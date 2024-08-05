@@ -1,5 +1,8 @@
 # TODO
 
+## REFERENCES
+- FastAPI MVC: https://github.com/ViktorViskov/fastapi-mvc/tree/main
+
 ## FUTURE
 - Add a way to parameterize the smart contract network
 

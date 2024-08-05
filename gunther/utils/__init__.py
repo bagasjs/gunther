@@ -3,6 +3,15 @@ import os
 
 from gunther.core import AuditError
 
+def kebab_to_title_case(text: str):
+    items = text.split("-")
+    new_items = []
+    for item in items:
+        parts = list(item)
+        parts[0] = parts[0].upper()
+        new_items.append("".join(parts))
+    return " ".join(new_items)
+
 def get_contract_name_from_etherscan(address: str) -> str:
     apikey = os.environ["ETHERSCAN_API_KEY"]
     url = f"https://api.etherscan.io/api?module=contract&action=getsourcecode&address={address}&apikey={apikey}"

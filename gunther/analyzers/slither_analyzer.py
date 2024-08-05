@@ -1,6 +1,7 @@
 from typing import List
 from gunther.core import AuditError
 from gunther.analyzers.core import Analyzer, FindingSeverity, AnalysisResult
+from gunther.utils import kebab_to_title_case
 import subprocess
 import json
 import os
@@ -47,7 +48,7 @@ class SlitherAnalyzer(Analyzer):
                     severity = FindingSeverity.Unknown
 
                 self._results.append(AnalysisResult(
-                    title=check,
+                    title=kebab_to_title_case(check),
                     severity=severity,
                     raw=detector["description"],
                     ))
