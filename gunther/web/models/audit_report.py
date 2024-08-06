@@ -4,6 +4,8 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from datetime import datetime
 
+from gunther.web.models.audit_finding import GetAuditFinding
+
 class AuditReport(BaseDBModel):
     __tablename__ = "audit_reports"
     id = Column(Integer, primary_key=True)
@@ -26,3 +28,7 @@ class GetAuditReport(BaseDTOModel):
     conclusion: str
     created: datetime
     updated: datetime
+
+class DetailedAuditReport(GetAuditReport):
+    findings: list[GetAuditFinding]
+

@@ -5,6 +5,7 @@
 
 ## FUTURE
 - Add a way to parameterize the smart contract network
+- Authentication/Authorization for external user
 
 ### Create REST-api for client side report generation
 - Find out whether FastAPI would be a viable option of Flask, since async would make the audit process faster
