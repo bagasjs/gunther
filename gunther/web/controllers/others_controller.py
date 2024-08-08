@@ -1,3 +1,4 @@
+import traceback
 from fastapi import APIRouter, Query, HTTPException, status
 from sqlalchemy import select, orm
 from datetime import datetime, timedelta
@@ -19,7 +20,6 @@ AMOUNT_OF_RETRIES = 3
 async def audit(dto: CreateAuditReport) -> AuditReport:
     title = dto.title
     address = dto.address
-    session = gunther_sessionmaker()
     with gunther_sessionmaker() as session:
         stmt = select(AuditReport).where(AuditReport.address == address).limit(1)
         report = session.execute(stmt).scalars().one_or_none()
@@ -29,10 +29,9 @@ async def audit(dto: CreateAuditReport) -> AuditReport:
             session.add(report)
         else:
             print(f"INFO: There's already an audit report for `{address}`")
-            required_time_range_to_change = (datetime.now() - timedelta(seconds=5)) # should be 1 week
+            required_time_range_to_change = (datetime.now() - timedelta(minutes=5)) # should be 1 week
             if report.updated > required_time_range_to_change:
                 print(f"INFO: The report `{address}` is already recent")
-                print(report.address == address)
                 return report
             else:
                 report.findings.clear() # Remove the old findings
@@ -53,6 +52,5 @@ async def audit(dto: CreateAuditReport) -> AuditReport:
                         ))
             except AuditError as e:
                 raise HTTPException(status_code=400, detail=f"Something went wrong: {e.message}")
-        session.commit()
         return report
 
