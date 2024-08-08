@@ -23,7 +23,7 @@ class GetAuditFinding(BaseDTOModel):
     raw: str
     description: str | None
     recommendation: str
-    report_id: int
+    report_id: int | None
     created: datetime | None
     updated: datetime | None
 

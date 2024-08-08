@@ -14,13 +14,6 @@ async def get_all(limit: int = Query(1000, gt=0), offset: int = Query(0, ge=0)) 
     with gunther_sessionmaker() as session:
         return session.query(AuditReport).limit(limit).offset(offset).all()
 
-@router.post("/", status_code=status.HTTP_201_CREATED, response_model=GetAuditReport)
-async def create(dto: CreateAuditReport) -> AuditReport:
-    report = AuditReport(title=dto.title, address=dto.address, conclusion="")
-    with gunther_sessionmaker() as session:
-        session.add(report)
-    return report
-
 @router.get("/{id}", response_model=DetailedAuditReport)
 async def get_by_id(id: int = Path(ge=1)) -> AuditReport | None:
     with gunther_sessionmaker() as session:
@@ -41,5 +34,5 @@ async def update(id: int = Path(ge=1)) -> AuditReport | None:
         report = session.execute(stmt).scalars().one_or_none()
         if not report :
             raise HTTPException(status_code=404, detail="Requested audit report is not found")
-        report.updated = datetime.now()
+        # report.updated = datetime.now()
         return report

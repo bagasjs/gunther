@@ -9,10 +9,11 @@ class Model(DeclarativeBase):
     pass
 
 def migrate_up():
-    pass
+    Model.metadata.create_all(bind=_engine)
 
 def migrate_down():
-    pass
+    Model.metadata.drop_all(bind=_engine)
 
 def migrate_fresh():
-    pass
+    migrate_down()
+    migrate_up()
