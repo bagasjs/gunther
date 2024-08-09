@@ -20,13 +20,13 @@ AMOUNT_OF_RETRIES = 3
 async def audit(dto: CreateAuditReport) -> AuditReport:
     title = dto.title
     address = dto.address
-    with gunther_sessionmaker() as session:
+    with gunther_sessionmaker() as first_session:
         stmt = select(AuditReport).where(AuditReport.address == address).limit(1)
-        report = session.execute(stmt).scalars().one_or_none()
+        report = first_session.execute(stmt).scalars().one_or_none()
         if report is None:
             print(f"INFO: There's no audit reports with address `{address}`")
             report = AuditReport(title=title, address=address, conclusion="")
-            session.add(report)
+            first_session.add(report)
         else:
             print(f"INFO: There's already an audit report for `{address}`")
             required_time_range_to_change = (datetime.now() - timedelta(minutes=5)) # should be 1 week
@@ -35,14 +35,17 @@ async def audit(dto: CreateAuditReport) -> AuditReport:
                 return report
             else:
                 report.findings.clear() # Remove the old findings
-        session.commit()
 
+    print(f"The report.address={address} has report.id={report.id}")
+    
+    with gunther_sessionmaker() as second_session:
+        report = second_session.get(AuditReport, report.id)
         for name, analyzer in list_of_analyzers.items():
             print(f"INFO: Running `{name}` analyzer")
             try:
                 analyzer.analyze(address)
                 for item in analyzer.get_results():
-                    session.add(AuditFinding(
+                    second_session.add(AuditFinding(
                         title = item.title,
                         severity = item.severity.value,
                         raw = item.raw,
