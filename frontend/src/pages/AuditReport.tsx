@@ -7,8 +7,9 @@ import  { SERVER_BASE_URL } from "../libs/config.ts";
 
 export default function Audit() {
     const { id } =  useParams();
+    /** @ts-ignore **/
     const [ report, setReport ] = useState<DetailedAuditReport>({
-        findings: [],
+        findings: [ ],
     });
     useEffect(() => {
         (async () => {

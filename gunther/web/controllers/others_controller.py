@@ -17,7 +17,7 @@ router = APIRouter(
 AMOUNT_OF_RETRIES = 3
 
 @router.post("/audit", status_code=status.HTTP_201_CREATED, response_model=GetAuditReport)
-async def audit(dto: CreateAuditReport) -> AuditReport:
+async def audit(dto: CreateAuditReport) -> AuditReport | None:
     title = dto.title
     address = dto.address
     with gunther_sessionmaker() as first_session:
@@ -27,6 +27,7 @@ async def audit(dto: CreateAuditReport) -> AuditReport:
             print(f"INFO: There's no audit reports with address `{address}`")
             report = AuditReport(title=title, address=address, conclusion="")
             first_session.add(report)
+            first_session.commit()
         else:
             print(f"INFO: There's already an audit report for `{address}`")
             required_time_range_to_change = (datetime.now() - timedelta(minutes=5)) # should be 1 week
@@ -36,10 +37,12 @@ async def audit(dto: CreateAuditReport) -> AuditReport:
             else:
                 report.findings.clear() # Remove the old findings
 
-    print(f"The report.address={address} has report.id={report.id}")
     
     with gunther_sessionmaker() as second_session:
-        report = second_session.get(AuditReport, report.id)
+        stmt = select(AuditReport).where(AuditReport.address == address).limit(1)
+        report = first_session.execute(stmt).scalars().one_or_none()
+        if report is None:
+            return None
         for name, analyzer in list_of_analyzers.items():
             print(f"INFO: Running `{name}` analyzer")
             try:
@@ -55,5 +58,6 @@ async def audit(dto: CreateAuditReport) -> AuditReport:
                         ))
             except AuditError as e:
                 raise HTTPException(status_code=400, detail=f"Something went wrong: {e.message}")
+        second_session.commit()
         return report
 
