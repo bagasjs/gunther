@@ -3,7 +3,7 @@ from sqlalchemy.orm import DeclarativeBase, sessionmaker, Session
 
 _engine = create_engine("sqlite:///database.sqlite") 
 gunther_sessionmaker = sessionmaker()
-gunther_sessionmaker.configure(bind=_engine)
+gunther_sessionmaker.configure(bind=_engine, autocommit=False, autoflush=False)
 
 class Model(DeclarativeBase):
     pass
