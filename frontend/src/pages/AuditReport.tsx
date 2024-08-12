@@ -1,25 +1,42 @@
 import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import { useParams } from "react-router-dom";
-import { DetailedAuditReport } from "../libs/dto";
+import { DetailedAuditReport, GetAuditFinding } from "../libs/dto";
 import  { SERVER_BASE_URL } from "../libs/config.ts";
 
-
-export default function Audit() {
+export default function AuditReport() {
     const { id } =  useParams();
     /** @ts-ignore **/
     const [ report, setReport ] = useState<DetailedAuditReport>({
         findings: [ ],
     });
+
     useEffect(() => {
         (async () => {
             const resp = await fetch(`${SERVER_BASE_URL}/api/reports/${id}`);
             if(resp.ok) {
                 setReport(await resp.json() as DetailedAuditReport);
-                console.log(report)
             }
         })();
     }, []);
+
+    const setAuditReportFinding = (findingId: number, newfinding: GetAuditFinding) => {
+        setReport(prevReport => ({
+            ...prevReport,
+            findings: prevReport.findings.map(finding => finding.id === findingId ? newfinding : finding)
+        }))
+    }
+
+    const paraphraseDescription = async (findingId: number) => {
+        const resp = await fetch(`${SERVER_BASE_URL}/api/findings/${findingId}/paraphrase-description`,{
+            method: "PUT",
+        });
+        if(resp.ok) {
+            const updatedFinding = await resp.json() as GetAuditFinding;
+            setAuditReportFinding(findingId, updatedFinding);
+        }
+    }
+
     return (
         <div className="dark:bg-gray-900 pb-5">
             <Navbar/>
@@ -35,14 +52,14 @@ export default function Audit() {
                             <h3 className="mb-2 text-lg font-medium text-gray-900 dark:text-white">{finding.title}</h3>
                             <div className="mb-6">
                                 <label htmlFor="message" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Description</label>
-                                <textarea id="message" rows={4} className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Write your thoughts here...">{finding.description}</textarea>
+                                <textarea id="message" rows={4} className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Write your thoughts here..." value={finding.description ?? ""} onChange={ev => setAuditReportFinding(finding.id, { ...finding, description: ev.target.value })}></textarea>
                                 <div className="mt-3">
-                                    <button type="button" className="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Paraphrase with AI</button>
+                                    <button type="button" className="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" onClick={() => paraphraseDescription(finding.id)}>Paraphrase with AI</button>
                                 </div>
                             </div> 
                             <div className="mb-6">
                                 <label htmlFor="message" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Recommendation</label>
-                                <textarea id="message" rows={4} className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Write your thoughts here...">{finding.recommendation}</textarea>
+                                <textarea id="message" rows={4} className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Write your thoughts here..." value={finding.recommendation ?? ""} onChange={ev => setAuditReportFinding(finding.id, { ...finding, recommendation: ev.target.value })}></textarea>
                                 <div className="mt-3">
                                     <button type="button" className="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Paraphrase with AI</button>
                                 </div>
@@ -52,7 +69,7 @@ export default function Audit() {
                 </div>
                 <div className="mb-6">
                     <label htmlFor="message" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Conclusions</label>
-                    <textarea id="message" rows={4} className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Write your thoughts here..." onChange={ev => setReport({ ...report, conclusion: ev.target.value }) }>{report.conclusion}</textarea>
+                    <textarea id="message" rows={4} className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Write your thoughts here..." onChange={ev => setReport({ ...report, conclusion: ev.target.value }) } value={report.conclusion}></textarea>
                 </div> 
                 <div className="w-full flex justify-end">
                     <button type="button" className="text-white bg-green-700 hover:bg-green-800 focus:outline-none focus:ring-4 focus:ring-green-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">Save</button> 

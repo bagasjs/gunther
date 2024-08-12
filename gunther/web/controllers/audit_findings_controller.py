@@ -38,8 +38,9 @@ async def update(id: int = Path(ge=1)) -> AuditFinding | None:
         return report
 
 
-@router.put("/{id}/generate-better-description", response_model=GetAuditFinding)
-async def generate_better_description(id: int = Path(ge=1)) -> AuditFinding | None:
+# TODO(bagasjs) Change the name into paraphrase since the description and recommendation could be None
+@router.put("/{id}/paraphrase-description", response_model=GetAuditFinding)
+async def paraphrase_description(id: int = Path(ge=1)) -> AuditFinding | None:
     with gunther_sessionmaker() as session:
         stmt = select(AuditFinding).where(AuditFinding.id == id).limit(1)
         report = session.execute(stmt).scalars().one_or_none()
@@ -50,10 +51,11 @@ async def generate_better_description(id: int = Path(ge=1)) -> AuditFinding | No
         report.description = GeminiWriter().make_description_from_raw_finding(report.raw)
         report.updated = datetime.now()
         session.commit()
+        session.refresh(report)
         return report
 
-@router.put("/{id}/generate-better-description", response_model=GetAuditFinding)
-async def generate_better_recommendation(id: int = Path(ge=1)) -> AuditFinding | None:
+@router.put("/{id}/paraphrase-recommendation", response_model=GetAuditFinding)
+async def paraphrase_recommendation(id: int = Path(ge=1)) -> AuditFinding | None:
     with gunther_sessionmaker() as session:
         stmt = select(AuditFinding).where(AuditFinding.id == id).limit(1)
         report = session.execute(stmt).scalars().one_or_none()

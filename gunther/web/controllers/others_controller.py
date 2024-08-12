@@ -29,7 +29,7 @@ async def audit(dto: CreateAuditReport) -> AuditReport | None:
             session.add(report)
         else:
             print(f"INFO: There's already an audit report for `{address}`")
-            required_time_range_to_change = (datetime.now() - timedelta(minutes=5)) # should be 1 week
+            required_time_range_to_change = (datetime.now() - timedelta(weeks=1)) # should be 1 week
             if report.updated > required_time_range_to_change:
                 print(f"INFO: The report `{address}` is already recent")
                 return report
