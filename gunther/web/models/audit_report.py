@@ -1,3 +1,4 @@
+from gunther.core import AuditFinding
 from gunther.web.core import BaseDBModel, BaseDTOModel
 from sqlalchemy import Column, Integer, String, Text, DateTime
 from sqlalchemy.orm import relationship
@@ -17,9 +18,14 @@ class AuditReport(BaseDBModel):
 
     findings = relationship("AuditFinding")
 
+
 class CreateAuditReport(BaseDTOModel):
     title: str
     address: str
+
+class UpdateAuditReport(BaseDTOModel):
+    title: str
+    conclusion: str
 
 class GetAuditReport(BaseDTOModel):
     id: int

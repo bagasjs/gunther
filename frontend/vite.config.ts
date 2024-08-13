@@ -16,6 +16,6 @@ export default defineConfig({
             }
         },
         outDir: "../resources/",
-        emptyOutDir: true,
+        emptyOutDir: false,
     },
 })

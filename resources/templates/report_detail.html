@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ report.title }}</title>
+</head>
+<body> 
+    <center>
+        <h1>An Audit Report</h1>
+    </center>
+    <ol type="A">
+        <li>
+            <h2>Description</h2>
+            <p>Our audit reported total of {{ report.findings|length }} finding(s), categorized as follows</p>
+            <ul>
+                {% for severity, count in finding_per_severity_categorization.items() %}
+                    {% if severity == "Note" %}
+                    <li>{{count}} {{ severity }}(s)</li>
+                    {% else %}
+                    <li>{{count}} {{severity}}-severity issue(s)</li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+
+            {% if finding_per_severity_categorization["High"] > 0 %}
+            <p>Based on those finding, There's critical security issue(s) were found.</p>
+            {% else %}
+            <p>Based on those finding, No critical security issue(s) were found.</p>
+            {% endif %}
+        </li>
+        <li>
+            <h2>Audit Findings</h2>
+            <ol type="1">
+                {% for finding in report.findings %}
+                <li>
+                    <h3>{{ finding.title }}</h3>
+                    <ol type="a">
+                        <li><h4>Severity: {{ finding.severity }}</h4></li>
+                        <li><h4>Description</h4><p>{{ finding.description }}</p></li>
+                        {% if finding.recommendation %}
+                        <li><h4>Recommendation</h4><p>{{ finding.recommendation }}</p></li>
+                        {% endif %}
+                    </ol>
+                </li>
+                {% endfor %}
+            </ol>
+        </li>
+        {% if report.conclusion %}
+        <li>
+            <h2>Conclusion</h2>
+            <p>
+                {{ report.conclusion }}
+            </p>
+        </li>
+        {% endif %}
+    </ol>
+</body>
+</html>

@@ -27,4 +27,6 @@ class GetAuditFinding(BaseDTOModel):
     created: datetime | None
     updated: datetime | None
 
-
+class UpdateAuditFinding(BaseDTOModel):
+    description: str
+    recommendation: str

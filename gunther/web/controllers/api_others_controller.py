@@ -1,4 +1,3 @@
-import traceback
 from fastapi import APIRouter, Query, HTTPException, status
 from sqlalchemy import select, orm
 from datetime import datetime, timedelta

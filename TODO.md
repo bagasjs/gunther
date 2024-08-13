@@ -4,6 +4,7 @@
 - FastAPI MVC: https://github.com/ViktorViskov/fastapi-mvc/tree/main
 
 ## FUTURE
+- Refactor into web application architecture
 - Add a way to parameterize the smart contract network
 - Authentication/Authorization for external user
 

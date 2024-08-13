@@ -1,4 +1,13 @@
 
+export interface UpdateAuditReport {
+    title: string
+    conclusion: string
+}
+
+export interface UpdateAuditFinding {
+    description: string
+    recommendation: string
+}
 
 export interface GetAuditFinding {
     id: number

@@ -1,38 +1,65 @@
-from fastapi import APIRouter, Query, HTTPException, Path, status
-from gunther.web.core import gunther_sessionmaker
-from gunther.web.models.audit_report import AuditReport, DetailedAuditReport, GetAuditReport, CreateAuditReport
+from fastapi import APIRouter, Request, Query, HTTPException, Path
+from gunther.web.core import gunther_sessionmaker, templates
+from gunther.web.models.audit_report import AuditReport
 from sqlalchemy import select, orm
-from datetime import datetime
 
 router = APIRouter(
-    prefix="/api/reports",
-    tags=["reports"],
+    prefix="/reports",
+    tags=["others-api-route"],
 )
 
-@router.get("/", response_model=list[GetAuditReport])
-async def get_all(limit: int = Query(1000, gt=0), offset: int = Query(0, ge=0)) -> list[AuditReport]:
+@router.get("/")
+async def all(request: Request, limit: int = Query(1000, gt=0), offset: int = Query(0, ge=0)):
     with gunther_sessionmaker() as session:
-        return session.query(AuditReport).limit(limit).offset(offset).all()
+        reports = session.query(AuditReport).limit(limit).offset(offset).all()
+        return templates.TemplateResponse(
+                request=request,
+                name="report_list.html",
+                context={
+                    "reports": reports,
+                })
 
-@router.get("/{id}", response_model=DetailedAuditReport)
-async def get_by_id(id: int = Path(ge=1)) -> AuditReport | None:
+@router.get("/{id}/edit")
+async def edit(request: Request, id: int = Path(ge=1)):
     with gunther_sessionmaker() as session:
-        report = session.query(AuditReport).where(AuditReport.id == id).options(orm.joinedload(AuditReport.findings)).first()
-        if not report:
-            raise HTTPException(status_code=404, detail="Requested audit report is not found")
-        return report 
+        report = (session
+                  .query(AuditReport)
+                  .where(AuditReport.id == id)
+                  .options(orm.joinedload(AuditReport.findings))
+                  .first())
+        if report is None:
+            raise HTTPException(status_code=404, detail=f"Not found report with id {id}")
+        return templates.TemplateResponse(
+                request=request,
+                name="report_editor.html",
+                context={
+                    "report": report,
+                })
 
-@router.get("/{address}", response_model=GetAuditReport)
-async def get_by_address(address: str) -> list[AuditReport]:
-    with gunther_sessionmaker() as session:
-        return session.query(AuditReport).where(AuditReport.address == address).all()
 
-@router.put("/{id}", response_model=GetAuditReport)
-async def update(id: int = Path(ge=1)) -> AuditReport | None:
+
+@router.get("/{id}")
+async def find(request: Request, id: int = Path(ge=1)):
     with gunther_sessionmaker() as session:
-        stmt = select(AuditReport).where(AuditReport.id == id).limit(1)
-        report = session.execute(stmt).scalars().one_or_none()
-        if not report :
-            raise HTTPException(status_code=404, detail="Requested audit report is not found")
-        # report.updated = datetime.now()
-        return report
+        report = (session
+                  .query(AuditReport)
+                  .where(AuditReport.id == id)
+                  .options(orm.joinedload(AuditReport.findings))
+                  .first())
+
+        finding_per_severity_categorization = {}
+        if report:
+            for finding in report.findings:
+                if finding.severity not in finding_per_severity_categorization.keys():
+                    finding_per_severity_categorization[finding.severity] = 1
+                else:
+                    finding_per_severity_categorization[finding.severity] += 1
+
+        return templates.TemplateResponse(
+                request=request,
+                name="report_detail.html",
+                context={
+                    "report": report,
+                    "finding_per_severity_categorization": finding_per_severity_categorization,
+                })
+
