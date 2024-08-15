@@ -23,7 +23,7 @@
                 {% endfor %}
             </ul>
 
-            {% if finding_per_severity_categorization["High"] > 0 %}
+            {% if "High" in finding_per_severity_categorization and finding_per_severity_categorization["High"] > 0 %}
             <p>Based on those finding, There's critical security issue(s) were found.</p>
             {% else %}
             <p>Based on those finding, No critical security issue(s) were found.</p>
