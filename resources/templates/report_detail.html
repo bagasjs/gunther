@@ -38,7 +38,7 @@
                     <ol type="a">
                         <li><h4>Severity: {{ finding.severity }}</h4></li>
                         <li><h4>Description</h4><p>{{ finding.description }}</p></li>
-                        {% if finding.recommendation %}
+                        {% if finding.recommendation | trim | length > 0 %}
                         <li><h4>Recommendation</h4><p>{{ finding.recommendation }}</p></li>
                         {% endif %}
                     </ol>
@@ -46,7 +46,7 @@
                 {% endfor %}
             </ol>
         </li>
-        {% if report.conclusion %}
+        {% if report.conclusion | trim | length > 0 %}
         <li>
             <h2>Conclusion</h2>
             <p>
